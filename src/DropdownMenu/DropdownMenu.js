@@ -33,8 +33,23 @@ class DropdownMenu extends Component {
     
     window.addEventListener("resize", this.handleResize)
 
+   
+
   }
+  //***************************
+  checkOutsideHandle = (e) =>{
+    if(this.menuWindow.current!=null){
+    if (!this.menuWindow.current.contains(e.target)&&this.menuWindow) {
+      if(this.props.isVisible){
+        this.props.onMenuClose()
+    
+      }  
+    }
+    }
+  }
+  //***************************
   componentWillUnmount() {
+
     window.removeEventListener("resize", this.handleResize)
   }
   handleResize = event =>{
@@ -57,7 +72,8 @@ class DropdownMenu extends Component {
   }
 
   checkTranslate = () => {
-  
+   // Add this for mouse events
+
     try{
       if (this.state.isFirstRun) {
         var mWidth =
@@ -109,11 +125,23 @@ class DropdownMenu extends Component {
   }
 
   ChangeFirstRun = () => {
+    //***************************
+    this.AddListener()
+    //***************************
     this.setState({
       isFirstRun: false,
     })
   }
+  //***************************
+  AddListener = () =>{
+       window.addEventListener('click', this.checkOutsideHandle, false);
 
+  }
+  RemoveListener = () =>{
+    window.removeEventListener('click', this.checkOutsideHandle, false);
+
+  }
+//***************************
   render() {
     try {
       return this.props.isVisible ? (
@@ -122,9 +150,24 @@ class DropdownMenu extends Component {
           onAnimationEnd={this.ChangeFirstRun}
           style={{ visibility: "show" }}
           className="show"
+          
         >
-          <TriangleTop />
+          <TriangleTop 
+          //***************************
+          onClick={e => {
+            // We are simply preventing the e based function up above from misfiring
+            e.stopPropagation()
+          
+          }}
+          //***************************
+           />
           <MainContainer
+          //***************************
+          onClick={e => {
+            // We are simply preventing the e based function up above from misfiring
+            e.stopPropagation()
+          }}
+          //***************************
             ref={this.menuWindow}
             style={{
               transform: "translateX(" + this.state.menuTranslate + "px",
@@ -135,7 +178,11 @@ class DropdownMenu extends Component {
           </MainContainer>
         </Wrapper>
       ) : !this.state.isFirstRun ? (
-        <Wrapper className="hide">
+        <Wrapper className="hide"  
+        //***************************
+         onAnimationEnd={this.RemoveListener}
+         //***************************
+         >
           <TriangleTop />
           <MainContainer
             style={{
@@ -300,10 +347,14 @@ const TriangleTop = styled.div`
 
 DropdownMenu.propTypes = {
   height: PropTypes.string,
-  width: PropTypes.string,
+  width: PropTypes.number,
   isVisible: PropTypes.bool,
+  onMenuClose: PropTypes.func,
 }
 DropdownMenu.defaultProps = {
   isVisible: false,
   width:290,
+  // ***************************
+  onMenuClose: function(){}
+  //*************************** */
 }
