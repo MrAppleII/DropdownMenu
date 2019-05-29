@@ -208,8 +208,7 @@ const FadeIn = keyframes`
 from {
   transform-style: preserve-3d;
   transform-origin: 0px 0px;
-  transform:  rotateX(-20deg);
-  transform: translateY(15.5px) translateX(50%);
+  transform: rotateX(-20deg) translateY(15.5px) translateX(50%);
 
   opacity: 0;
 } 
@@ -217,8 +216,7 @@ to {
   transform-style: preserve-3d;
   transform-origin: 0px 0px;
   
-  transform: rotateX(0deg);
-  transform: translateY(15.5px) translateX(50%);
+  transform:  rotateX(0deg) translateY(15.5px) translateX(50%);
 
   opacity: 0.99;
 }
@@ -226,16 +224,16 @@ to {
 const FadeOut = keyframes`
 from {
   transform-style: preserve-3d;
-  transform:  rotateX(0deg);
-  transform: translateY(15.5px) translateX(50%);
+  
+  transform:rotateX(0deg) translateY(15.5px) translateX(50%);
 
   visibility: visible;
   opacity: 0.99;
 } 
 to {
   transform-style: preserve-3d;
-  transform:  rotateX(-30deg);
-  transform: translateY(15.5px) translateX(50%);
+  
+  transform: rotateX(-30deg) translateY(15.5px) translateX(50%);
 
   opacity: 0;
   
