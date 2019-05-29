@@ -24,12 +24,15 @@ class DropdownMenu extends Component {
       windowWidth: null,
       windowHeight: null,
       menuWidth: null,
-      menuTranslate: -195,
+      menuTranslate: -(this.props.width/2),
     }
     this.menuWindow = React.createRef()
+    
   }
   componentDidMount() {
+    
     window.addEventListener("resize", this.handleResize)
+
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.handleResize)
@@ -54,6 +57,7 @@ class DropdownMenu extends Component {
   }
 
   checkTranslate = () => {
+  
     try{
       if (this.state.isFirstRun) {
         var mWidth =
@@ -124,6 +128,7 @@ class DropdownMenu extends Component {
             ref={this.menuWindow}
             style={{
               transform: "translateX(" + this.state.menuTranslate + "px",
+              width:""+this.props.width+"px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
@@ -135,6 +140,7 @@ class DropdownMenu extends Component {
           <MainContainer
             style={{
               transform: "translateX(" + this.state.menuTranslate + "px",
+              width:""+this.props.width+"px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
@@ -156,7 +162,8 @@ from {
   transform-style: preserve-3d;
   transform-origin: 0px 0px;
   transform:  rotateX(-20deg);
-  
+  transform: translateY(15.5px) translateX(50%);
+
   opacity: 0;
 } 
 to {
@@ -164,6 +171,7 @@ to {
   transform-origin: 0px 0px;
   
   transform: rotateX(0deg);
+  transform: translateY(15.5px) translateX(50%);
 
   opacity: 0.99;
 }
@@ -172,6 +180,7 @@ const FadeOut = keyframes`
 from {
   transform-style: preserve-3d;
   transform:  rotateX(0deg);
+  transform: translateY(15.5px) translateX(50%);
 
   visibility: visible;
   opacity: 0.99;
@@ -179,6 +188,7 @@ from {
 to {
   transform-style: preserve-3d;
   transform:  rotateX(-30deg);
+  transform: translateY(15.5px) translateX(50%);
 
   opacity: 0;
   
@@ -203,7 +213,8 @@ const MainContainer = styled.div`
   max-height: ${props => props.maxHeight || "420px"};
   max-width: ${props => props.maxWidth || ""};
 
-  width: ${props => props.width || "390px"};
+
+ /* width: ${props => `"`+props.width+`px` || "390px"}; */
 
   transform-origin: 0% 0%;
   will-change: transform, opacity;
@@ -229,17 +240,22 @@ const MainContainer = styled.div`
   color: #000;
 `
 const Wrapper = styled.div`
-position:relative
+position:relative;
 /* positioning */
-left:auto;
-right:auto;
+
+transform: translateY(15.5px) translateX(50%);
+margin-left:auto; 
+margin-right:auto;
 /* Visibility */
 visibility: hidden;
 
+height:0;
+width:100%;
 will-change: transform, opacity;
 
 /* Animations :D */
 &.show {
+  
   visibility: visible !important;
   animation: ${FadeIn} 0.15s ease-in;
 }
@@ -289,4 +305,5 @@ DropdownMenu.propTypes = {
 }
 DropdownMenu.defaultProps = {
   isVisible: false,
+  width:290,
 }
