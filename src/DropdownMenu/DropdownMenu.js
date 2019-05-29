@@ -8,6 +8,7 @@ import PropTypes from "prop-types"
     right below the component you want it to belong to. It will automagically reposition itself in the browser window. 
 
     Props:
+    props.maxHeight sets the max height for the menu
     props.height Sets the height for the menu.
     props.width Sets the width for the menu.
     props.isVisible Sets the visibilty of the menu!
@@ -197,7 +198,7 @@ const MainContainer = styled.div`
   background-color: ${props => props.containerColor || "white"};
 
   /* Dimensions */
-  height: ${props => props.maxheight || ""};
+  height: ${props => props.height || ""};
 
   max-height: ${props => props.maxHeight || "420px"};
   max-width: ${props => props.maxWidth || ""};
