@@ -14,7 +14,7 @@ import PropTypes from "prop-types"
     props.isVisible Sets the visibilty of the menu!
 
 */
-class DropdownMenu extends Component {
+class DropUpMenu extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -24,6 +24,7 @@ class DropdownMenu extends Component {
       windowWidth: null,
       windowHeight: null,
       menuWidth: null,
+      menuYTranslate:0,
       menuTranslate: -(this.props.width/2),
     }
     this.menuWindow = React.createRef()
@@ -32,7 +33,7 @@ class DropdownMenu extends Component {
   componentDidMount() {
     
     window.addEventListener("resize", this.handleResize)
-
+  
    
 
   }
@@ -71,11 +72,15 @@ class DropdownMenu extends Component {
   
   }
 
+  
+
   checkTranslate = () => {
    // Add this for mouse events
 
     try{
+
       if (this.state.isFirstRun) {
+          
         var mWidth =
           this.menuWindow.current.getBoundingClientRect().right -
           this.menuWindow.current.getBoundingClientRect().left
@@ -83,8 +88,17 @@ class DropdownMenu extends Component {
           windowWidth: window.innerWidth,
           windowHeight: window.innerHeight,
           menuTranslate: -1 * (mWidth / 2),
+          
         })
-
+       var mHeight = this.menuWindow.current.scrollHeight
+       
+       if(this.state.menuYTranslate == 0 || this.state.menuYTranslate!=mHeight){
+           console.log(this.menuWindow.current.scrollHeight)
+        this.setState({
+            menuYTranslate:-1*(this.menuWindow.current.scrollHeight-12.5/2),
+           })
+       }
+       
         var rightSideDistance = ~~(
           window.innerWidth -
           this.menuWindow.current.getBoundingClientRect().right
@@ -172,6 +186,7 @@ class DropdownMenu extends Component {
             style={{
               transform: "translateX(" + this.state.menuTranslate + "px",
               width:""+this.props.width+"px",
+              top:""+this.state.menuYTranslate+"px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
@@ -188,6 +203,7 @@ class DropdownMenu extends Component {
             style={{
               transform: "translateX(" + this.state.menuTranslate + "px",
               width:""+this.props.width+"px",
+              top:""+this.state.menuYTranslate+"px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
@@ -202,13 +218,13 @@ class DropdownMenu extends Component {
     }
   }
 }
-export default DropdownMenu
+export default DropUpMenu
 
 const FadeIn = keyframes`
 from {
   transform-style: preserve-3d;
   transform-origin: 0px 0px;
-  transform: rotateX(-20deg) translateY(15.5px) translateX(50%);
+  transform: rotateX(-20deg) translateY(-20.65px) translateX(50%);
 
   opacity: 0;
 } 
@@ -216,7 +232,7 @@ to {
   transform-style: preserve-3d;
   transform-origin: 0px 0px;
   
-  transform:  rotateX(0deg) translateY(15.5px) translateX(50%);
+  transform:  rotateX(0deg)translateY(-20.65px) translateX(50%);
 
   opacity: 0.99;
 }
@@ -225,7 +241,7 @@ const FadeOut = keyframes`
 from {
   transform-style: preserve-3d;
   
-  transform:rotateX(0deg) translateY(15.5px) translateX(50%);
+  transform:rotateX(0deg) translateY(-20.65px) translateX(50%);
 
   visibility: visible;
   opacity: 0.99;
@@ -233,7 +249,7 @@ from {
 to {
   transform-style: preserve-3d;
   
-  transform: rotateX(-30deg) translateY(15.5px) translateX(50%);
+  transform: rotateX(-30deg) translateY(-20.65px) translateX(50%);
 
   opacity: 0;
   
@@ -243,7 +259,6 @@ to {
 const MainContainer = styled.div`
   position: absolute;
   overflow: hidden;
-
   /* Shadows */
   box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25),
     0 30px 60px -30px rgba(0, 0, 0, 0.3),
@@ -258,12 +273,12 @@ const MainContainer = styled.div`
   max-height: ${props => props.maxHeight || "420px"};
   max-width: ${props => props.maxWidth || ""};
 
+  top: ${props => ``+(props.height)+`px` || "-219px"};
 
  /* width: ${props => `"`+props.width+`px` || "390px"}; */
 
   transform-origin: 0% 0%;
   will-change: transform, opacity;
-
   z-index: 0;
 
   /* Borders */
@@ -288,13 +303,14 @@ const Wrapper = styled.div`
 position:relative;
 /* positioning */
 
-transform: translateY(15.5px) translateX(50%);
+transform: translateY(-20.65px) translateX(50%);
 margin-left:auto; 
 margin-right:auto;
 /* Visibility */
 visibility: hidden;
 
 height:0;
+
 width:0;
 will-change: transform, opacity;
 
@@ -343,14 +359,14 @@ const TriangleTop = styled.div`
     0 -18px 60px -10px rgba(0, 0, 0, 0.025);
 `
 
-DropdownMenu.propTypes = {
-  height: PropTypes.string,
+DropUpMenu.propTypes = {
+  height: PropTypes.number,
   width: PropTypes.number,
   isVisible: PropTypes.bool,
   onMenuClose: PropTypes.func,
  
 }
-DropdownMenu.defaultProps = {
+DropUpMenu.defaultProps = {
   isVisible: false,
   width:290,
   
