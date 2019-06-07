@@ -93,7 +93,7 @@ class DropUpMenu extends Component {
        var mHeight = this.menuWindow.current.scrollHeight
        
        if(this.state.menuYTranslate == 0 || this.state.menuYTranslate!=mHeight){
-           console.log(this.menuWindow.current.scrollHeight)
+       //    console.log(this.menuWindow.current.scrollHeight)
         this.setState({
             menuYTranslate:-1*(this.menuWindow.current.scrollHeight-12.5/2),
            })
