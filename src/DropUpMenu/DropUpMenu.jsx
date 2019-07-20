@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import styled, { keyframes } from "styled-components"
 import PropTypes from "prop-types"
+import ReactDOM from 'react-dom'
 
 /*
     File: DropdownMenu.js
@@ -11,7 +12,7 @@ import PropTypes from "prop-types"
     props.maxHeight sets the max height for the menu
     props.height Sets the height for the menu.
     props.width Sets the width for the menu.
-    props.isVisible Sets the visibilty of the menu!
+    props.isVisible Sets the visibility of the menu!
 
 */
 class DropUpMenu extends Component {
@@ -23,18 +24,23 @@ class DropUpMenu extends Component {
       isFirstRun: true,
       windowWidth: null,
       windowHeight: null,
-      menuWidth: null,
+      menuWidth:undefined,
       menuYTranslate:0,
       menuTranslate: -(this.props.width/2),
     }
     this.menuWindow = React.createRef()
-    
+    this.setPosition = this.setPosition.bind(this)
   }
   componentDidMount() {
-    
     window.addEventListener("resize", this.handleResize)
-  
-   
+  }
+
+  GetElementAtPosition = (posX,posY)=>{
+    var elem = document.elementFromPoint(posX, posY);
+    if(elem===this.menuWindow){
+      console.log("Window no obscured")
+    }
+    console.log(elem)
 
   }
   //***************************
@@ -73,7 +79,47 @@ class DropUpMenu extends Component {
   }
 
   
+  setPosition(position){
+    try{
+     // console.log("Setting to position",position)
+        const menuWidth = this.state.menuWidth
+        
+        if(position==="left" || position === "Left"){
+          // Sets the content of the menu to the left
+           var newValue = -1 * menuWidth + 20
+           // We need to watch out for unneeded set states
+           if(this.state.menuTranslate!==newValue){
+            this.setState({
+              menuTranslate: -1 * menuWidth + 20,
+            })
+           }
+          
 
+        }else if(position==="right" || position==="right"){
+          //Set it to the right
+          var newValue =1 * -20
+          if(this.state.menuTranslate!==newValue){
+          this.setState({
+            menuTranslate: 1 * -20,
+          })
+        }
+        }else{
+            //console.log("Menu Width", this.state.menuWidth)
+            // The default is to set it to middle
+            var newValue =-1 * (menuWidth / 2)
+            if(this.state.menuTranslate!==newValue){
+            this.setState({
+              menuTranslate: -1 * (menuWidth / 2),
+            })
+          }
+        }
+    }catch(e){
+      if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+        console.log(e)
+    }}
+    }
+
+  
   checkTranslate = () => {
    // Add this for mouse events
 
@@ -81,18 +127,23 @@ class DropUpMenu extends Component {
 
       if (this.state.isFirstRun) {
           
+       
         var mWidth =
           this.menuWindow.current.getBoundingClientRect().right -
           this.menuWindow.current.getBoundingClientRect().left
+          
         this.setState({
           windowWidth: window.innerWidth,
           windowHeight: window.innerHeight,
           menuTranslate: -1 * (mWidth / 2),
-          
-        })
+          menuWidth:mWidth,
+        },
+         ()=>{
+        
+       
        var mHeight = this.menuWindow.current.scrollHeight
        
-       if(this.state.menuYTranslate == 0 || this.state.menuYTranslate!=mHeight){
+       if(this.state.menuYTranslate === 0 || this.state.menuYTranslate!==mHeight){
        //    console.log(this.menuWindow.current.scrollHeight)
         this.setState({
             menuYTranslate:-1*(this.menuWindow.current.scrollHeight-12.5/2),
@@ -107,7 +158,11 @@ class DropUpMenu extends Component {
           .left
 
         if (rightSideDistance <= 20.0 && leftSideDistance <= 20) {
+          // In this circumstance, it is a squeeze so we have to see 
+          // which of the two is less small.
+          
           if (rightSideDistance < leftSideDistance) {
+            
             this.setState({
               menuTranslate: -1 * mWidth + 20,
             })
@@ -118,18 +173,25 @@ class DropUpMenu extends Component {
           }
         }
         if (rightSideDistance <= 20.0) {
-          this.setState({
-            menuTranslate: -1 * mWidth + 20,
-          })
+         this.setPosition("left")
         } else if (leftSideDistance <= 20) {
-          this.setState({
-            menuTranslate: 1 * -20,
-          })
+         
+          this.setPosition("right")
         } else {
-          this.setState({
-            menuTranslate: -1 * (mWidth / 2),
-          })
+          if(this.props.defaultAlign){
+              // we are override the default
+              if(this.props.defaultAlign==="left" || this.props.defaultAlign==="Left" ){
+                this.setPosition("left")
+              }
+              if(this.props.defaultAlign==="right" || this.props.defaultAlign==="Right" ){
+                this.setPosition("right")
+              }
+          }
+          else{
+            this.setPosition("center")
+          }
         }
+      })
       }
     }catch(e){
       if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
@@ -141,6 +203,11 @@ class DropUpMenu extends Component {
   ChangeFirstRun = () => {
     //***************************
     this.AddListener()
+    var leftBoundary = this.menuWindow.current.getBoundingClientRect().left
+    var rightBoundary =this.menuWindow.current.getBoundingClientRect().right
+    var posY  =this.menuWindow.current.getBoundingClientRect().y
+  
+   //this.GetElementAtPosition(leftBoundary-10,posY+10)
     //***************************
     this.setState({
       isFirstRun: false,
@@ -158,7 +225,7 @@ class DropUpMenu extends Component {
 //***************************
   render() {
     try {
-      return this.props.isVisible ? (
+      return this.props.isVisible ?(
         <Wrapper
           onAnimationStart={this.checkTranslate}
           onAnimationEnd={this.ChangeFirstRun}
@@ -185,14 +252,14 @@ class DropUpMenu extends Component {
             ref={this.menuWindow}
             style={{
               transform: "translateX(" + this.state.menuTranslate + "px",
-              width:""+this.props.width+"px",
+              width:"auto",
               top:""+this.state.menuYTranslate+"px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
           </MainContainer>
         </Wrapper>
-      ) : !this.state.isFirstRun ? (
+     ) : !this.state.isFirstRun ? (
         <Wrapper className="hide"  
         //***************************
          onAnimationEnd={this.RemoveListener}
@@ -202,14 +269,14 @@ class DropUpMenu extends Component {
           <MainContainer
             style={{
               transform: "translateX(" + this.state.menuTranslate + "px",
-              width:""+this.props.width+"px",
+              width:"auto",
               top:""+this.state.menuYTranslate+"px",
             }}
           >
             <InnerChildContainer>{this.props.children}</InnerChildContainer>
           </MainContainer>
         </Wrapper>
-      ) : null
+    ) : null
     } catch (e) {
       if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
         console.log(e)
@@ -234,7 +301,7 @@ to {
   
   transform:  rotateX(0deg)translateY(-20.65px) translateX(50%);
 
-  opacity: 0.99;
+  opacity:1;
 }
 `
 const FadeOut = keyframes`
@@ -244,7 +311,7 @@ from {
   transform:rotateX(0deg) translateY(-20.65px) translateX(50%);
 
   visibility: visible;
-  opacity: 0.99;
+  opacity: 1;
 } 
 to {
   transform-style: preserve-3d;
@@ -259,11 +326,8 @@ to {
 const MainContainer = styled.div`
   position: absolute;
   overflow: hidden;
-  /* Shadows */
-  box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25),
-    0 30px 60px -30px rgba(0, 0, 0, 0.3),
-    0 -18px 60px -10px rgba(0, 0, 0, 0.025);
-
+  /* Shadows */ 
+    white-space: nowrap;
   /* Background */
   background-color: ${props => props.containerColor || "white"};
 
@@ -278,7 +342,6 @@ const MainContainer = styled.div`
  /* width: ${props => `"`+props.width+`px` || "390px"}; */
 
   transform-origin: 0% 0%;
-  will-change: transform, opacity;
   z-index: 0;
 
   /* Borders */
@@ -308,13 +371,13 @@ margin-left:auto;
 margin-right:auto;
 /* Visibility */
 visibility: hidden;
-
 height:0;
-
 width:0;
-will-change: transform, opacity;
+filter: drop-shadow(0 30px 60px  rgba(0, 0, 0, 0.4));
 
-/* Animations :D */
+/* shadows are handles as multiple drop filters */
+
+/* Animations */
 &.show {
   
   visibility: visible !important;
@@ -342,7 +405,6 @@ const TriangleTop = styled.div`
   transform: translateX(50%) translateX(-12.5px) translateY(-60%)
     translateY(0px) rotate(45deg);
   transform-origin: 0% 0%;
-  will-change: transform, opacity;
 
   /* positioning */
   position: absolute;
@@ -353,10 +415,7 @@ const TriangleTop = styled.div`
   /* Borders */
   border-radius: 2px;
 
-  /*shadows*/
-  box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25),
-    0 30px 60px -30px rgba(0, 0, 0, 0.3),
-    0 -18px 60px -10px rgba(0, 0, 0, 0.025);
+
 `
 
 DropUpMenu.propTypes = {
@@ -364,11 +423,13 @@ DropUpMenu.propTypes = {
   width: PropTypes.number,
   isVisible: PropTypes.bool,
   onMenuClose: PropTypes.func,
+  defaultAlign:PropTypes.string,
  
 }
 DropUpMenu.defaultProps = {
   isVisible: false,
   width:290,
+
   
   // ***************************
   onMenuClose: function(){}
